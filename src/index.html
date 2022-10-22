@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workout tracker</title>
     <link rel="stylesheet" href="css/main.css">
-    <script src="js/main.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
 </head>
 <body>
     <div id="app">
@@ -20,7 +20,7 @@
                 </tr>
             </thead>
             <tbody class="entries">
-                <tr>
+                <tr class="tracker__row tracker__row--add">
                     <td>
                         <input type="date" name="" class="tracker__date">
                     </td>
@@ -42,6 +42,9 @@
                         <button type="button" class="tracker__button">&times;</button>
                     </td>
                 </tr>
+            </tbody>
+            <tbody>
+                <tr class="tracker__row tracker__row--add"></tr>
             </tbody>
         </table>
     </div>

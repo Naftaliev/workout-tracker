@@ -6,7 +6,6 @@ const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const HtmlReplaceWebpackPlugin = require("html-replace-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ImageminPlugin = require("imagemin-webpack-plugin").default;
-const MinifyPlugin = require("babel-minify-webpack-plugin");
 
 const devMode = process.env.NODE_ENV !== "production";
 
@@ -120,7 +119,6 @@ const CONFIG = {
 if (!devMode) {
   CONFIG.output.publicPath = "./";
   CONFIG.output.filename = "js/app.js";
-  CONFIG.plugins.push(new MinifyPlugin());
   CONFIG.module.rules.push({
     test: [/\.js$/],
     exclude: [/node_modules/],
