@@ -10,12 +10,12 @@ const ImageminPlugin = require("imagemin-webpack-plugin").default;
 const devMode = process.env.NODE_ENV !== "production";
 
 const CONFIG = {
-  entry: "./src/js/app.js",
+  entry: "./src/js/main.js",
   mode: process.env.NODE_ENV,
   devtool: "cheap-module-source-map",
   output: {
     path: path.resolve(__dirname, "./build"),
-    filename: "app.js",
+    filename: "main.js",
   },
   plugins: [
     new HtmlWebpackPlugin({
