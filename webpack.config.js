@@ -30,11 +30,11 @@ const CONFIG = {
     new HtmlReplaceWebpackPlugin([
       {
         pattern:
-          '<script type="text/javascript" src="../build/app.js"></script>',
+          '<script src="./js/main.js"></script>',
         replacement: "",
       },
       {
-        pattern: '<link rel="stylesheet" href="./css/app.css">',
+        pattern: '<link rel="stylesheet" href="./css/main.css">',
         replacement: "",
       },
     ]),
@@ -118,7 +118,7 @@ const CONFIG = {
 
 if (!devMode) {
   CONFIG.output.publicPath = "./";
-  CONFIG.output.filename = "js/app.js";
+  CONFIG.output.filename = "js/main.js";
   CONFIG.module.rules.push({
     test: [/\.js$/],
     exclude: [/node_modules/],
