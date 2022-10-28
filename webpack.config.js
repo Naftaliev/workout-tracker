@@ -1,130 +1,104 @@
-const path = require("path");
-const webpack = require("webpack");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
-const HtmlReplaceWebpackPlugin = require("html-replace-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const ImageminPlugin = require("imagemin-webpack-plugin").default;
 
-const devMode = process.env.NODE_ENV !== "production";
 
-const CONFIG = {
-  entry: "./src/js/main.js",
-  mode: process.env.NODE_ENV,
-  devtool: "cheap-module-source-map",
-  output: {
-    path: path.resolve(__dirname, "./build"),
-    filename: "main.js",
+let mode = 'development'
+if (process.env.NODE_ENV === 'production') {
+    mode = 'production'
+}
+console.log(mode + ' mode')
+
+module.exports = {
+  mode: mode, 
+  entry: {
+    main: path.resolve(__dirname, 'src/index.js'),
   },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: "./src/index.html",
-      filename: "./index.html",
-      minify: {
-        collapseWhitespace: true,
-        minifyCSS: true,
-        removeComments: true,
-      },
-    }),
-    new HtmlReplaceWebpackPlugin([
-      {
-        pattern:
-          '<script src="./js/main.js"></script>',
-        replacement: "",
-      },
-      {
-        pattern: '<link rel="stylesheet" href="./css/main.css">',
-        replacement: "",
-      },
-    ]),
-    new MiniCssExtractPlugin({
-      filename: devMode ? "[name].css" : "[name].[hash].css",
-      chunkFilename: devMode ? "[id].css" : "[id].[hash].css",
-    }),
-    new OptimizeCssAssetsPlugin({
-      cssProcessorOptions: { discardComments: { removeAll: true } },
-    }),
-    new CopyWebpackPlugin([
-      {
-        from: "src/images/",
-        to: "images/",
-      },
-      {
-        from: "src/*.txt",
-        to: "./[name].[ext]",
-        toType: "template",
-      },
-    ]),
-    new ImageminPlugin({
-      disable: devMode,
-      test: /\.(jpe?g|png|gif|svg)$/i,
-      optipng: { optimizationLevel: 3 },
-      jpegtran: { progressive: true },
-      gifsicle: { optimizationLevel: 1 },
-      svgo: {},
-    }),
-  ],
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].js',
+    assetModuleFilename: "assets/[hash][ext]",
+    clean: true,
+  },
+  devtool: 'inline-source-map',
+  devServer: {
+    compress: true,
+    port: 9000,
+    //open: 'C:\Program Files\Firefox Developer Edition\firefox.exe'
+  },
+  resolve: {
+    alias: {
+      _src: path.resolve(__dirname, 'src/'),
+    },
+  },
+  //loaders
   module: {
     rules: [
+      //html
       {
-        test: /\.(css|scss)$/i,
+        test: /\.html$/i,
+        loader: "html-loader",
+        },
+      //css
+      {
+        test: /\.(sa|sc|c)ss$/,
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            // options: {
-            //   hmr: devMode,
-            // },
-          },
-          {
-            loader: "css-loader",
-            options: {
-              sourceMap: true,
-              importLoaders: 2,
+            
+            (mode === 'development') ? "style-loader" : MiniCssExtractPlugin.loader,
+            "css-loader",
+            {
+                loader: "postcss-loader",
+                options: {
+                    postcssOptions: {
+                        plugins: [
+                            [
+                                "postcss-preset-env",
+                                {
+                                    // Options
+                                },
+                            ],
+                        ],
+                    },
+                },
             },
-          },
-          {
-            loader: "postcss-loader",
-            options: {
-              sourceMap: true,
-            },
-          },
-          {
-            loader: "sass-loader",
-            options: { sourceMap: true },
-          },
+            "sass-loader",
         ],
       },
+      //images
+      { test: /\.(svg|ico|png|webp|jpg|gif|jpeg)$/, type: 'asset/resource' },
+      //fonts
+      { test: /\.(woff|eot|ttf|woff2)$/, type: 'asset/resource' },
+      //js for babel
       {
-        test: /\.(png|jpg|gif)$/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {},
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
           },
-        ],
+        },
+      },
+      {
+        test: /\.pug$/,
+        loader: 'pug-loader',
+        // loader: 'pug-html-loader',
+        // options: {
+        //   exports: false
+        // },
+        exclude: /(node_modules|bower_components)/,
       },
     ],
   },
-  devServer: {
-    contentBase: path.join(__dirname, "src"),
-    compress: true,
-    port: 3001,
-    hot: true,
-    watchContentBase: true,
-    noInfo: true,
-  },
+  //plugins
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "src/index.html",
+      filename: 'index.html',
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css'
+  }),
+  ],
 };
 
-if (!devMode) {
-  CONFIG.output.publicPath = "./";
-  CONFIG.output.filename = "js/main.js";
-  CONFIG.module.rules.push({
-    test: [/\.js$/],
-    exclude: [/node_modules/],
-    loader: "babel-loader",
-    options: { presets: ["env"] },
-  });
-}
-
-module.exports = CONFIG;
