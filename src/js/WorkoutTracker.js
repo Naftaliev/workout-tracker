@@ -75,6 +75,10 @@ export default class WorkoutTracker {
             template.innerHTML = WorkoutTracker.rowHtml().trim();
             row = template.content.firstElementChild;
 
+            row.querySelector(".tracker__date").value = data.date;
+            row.querySelector(".tracker__workout").value = data.workout;
+            row.querySelector(".tracker__duration").value = data.duration;
+
             tableBody.appendChild(row);
         };
 
@@ -83,5 +87,11 @@ export default class WorkoutTracker {
         });
 
         this.entries.forEach(data => addRow(data));
+    }
+    
+    addEntry(data) {
+        this.entry.push(data);
+        this.saveEntries();
+        this.updateView();
     }
 }
