@@ -1,0 +1,1 @@
+import WorkoutTracker from"./WorkoutTracker.js";var app=document.getElementById("app"),wt=new WorkoutTracker(app);console.log(wt);
