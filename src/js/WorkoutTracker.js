@@ -6,6 +6,19 @@ export default class WorkoutTracker {
 
          this.loadEntries();
          this.updateView();
+
+         this.root.querySelector(".tracker__add").addEventListener("click", () => {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, "0");
+            const day = date.getDay().toString().padStart(2, "0");
+            
+            this.addEntry({
+                date: `${ year }-${ month }-${ day }`,
+                workout: "walking",
+                duration: "40 minutes"
+            });
+        });
     }
     
     static html() {
@@ -23,10 +36,11 @@ export default class WorkoutTracker {
           
         </tbody>
         <tbody>
-            <tr class="tracker__row tracker__row--add"></tr>
+        <tr class="tracker__row tracker__row--add">
             <td colspan="4">
                 <span class="tracker__add">Add Entry &plus;</span>
             </td>
+        </tr>
         </tbody>
     </table>
         `;      
@@ -34,12 +48,12 @@ export default class WorkoutTracker {
 
     static rowHtml() {
         return `
-             <tr>
+             <tr class="tracker__row">
                 <td>
-                    <input type="date" name="" class="tracker__date">
+                    <input type="date" class="tracker__date">
                 </td>
                 <td>
-                    <select name="" id="" class="tracker__workout">
+                    <select class="tracker__workout">
                         <option value="walking">Walking</option>
                         <option value="running">Running</option>
                         <option value="outdoor-cycling">Outdoor Cycling</option>
@@ -53,7 +67,7 @@ export default class WorkoutTracker {
                     <span class="tracker__text">minutes</span>
                 </td>
                 <td>
-                    <button type="button" class="tracker__button">&times;</button>
+                    <button type="button" class="tracker__button tracker__delete">&times;</button>
                 </td>
             </tr>
         `;      
@@ -79,18 +93,43 @@ export default class WorkoutTracker {
             row.querySelector(".tracker__workout").value = data.workout;
             row.querySelector(".tracker__duration").value = data.duration;
 
+            row.querySelector(".tracker__date").addEventListener("change", ({ target }) => {
+                data.date = target.value;
+                this.saveEntries();
+            });
+            
+            row.querySelector(".tracker__workout").addEventListener("change", ({ target }) => {
+                data.workout = target.value;
+                this.saveEntries();
+            });
+
+            row.querySelector(".tracker__duration").addEventListener("change", ({ target }) => {
+                data.duration = target.value;
+                this.saveEntries();
+            });
+
+            row.querySelector(".tracker__delete").addEventListener("click", () => {
+                this.deleteEntry(data);
+            });
+
             tableBody.appendChild(row);
         };
 
         tableBody.querySelectorAll(".tracker__row").forEach(row => {
-            row.delete();
+            row.remove();
         });
 
         this.entries.forEach(data => addRow(data));
     }
     
     addEntry(data) {
-        this.entry.push(data);
+        this.entries.push(data);
+        this.saveEntries();
+        this.updateView();
+    }
+
+    deleteEntry(dataToDelete) {
+        this.entries = this.entries.filter(data => data !== dataToDelete);
         this.saveEntries();
         this.updateView();
     }
